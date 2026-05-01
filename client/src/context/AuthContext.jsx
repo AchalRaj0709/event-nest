@@ -1,4 +1,5 @@
 import React from "react";
+import api from "../utils/axios";
 
 export const AuthContext = React.createContext();
 
@@ -24,32 +25,31 @@ export const AuthProvider = ({ children }) => {
         }
         catch(err){
             console.error("Login failed", err);
-            throw err;
+            throw err.response?.data || err;
         }
     };
 
 const register = async (name, email, password) => {
     try {
         const { data } = await api.post('/auth/register', { name, email, password });
-        setUser(data);
         return data;
     } catch (err) {
         console.error("Registration failed", err);
-        throw err;
+        throw err.response?.data || err;
     }
 };
 
 
-const verifyOtp = async () => {
+const verifyOTP = async (email, otp) => {
     try {
-        const { data } = await api.post('/auth/verify-otp');
+        const { data } = await api.post('/auth/verify-otp', { email, otp, action: 'account_verification' });
         setUser(data);
         localStorage.setItem("user", JSON.stringify(data));
         localStorage.setItem("token", data.token);
         return data;
     } catch (err) {
         console.error("OTP verification failed", err);
-        throw err;
+        throw err.response?.data || err;
     }
 };
 
@@ -60,7 +60,7 @@ const logout = () => {
 };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, verifyOtp, logout ,register}}>
+    <AuthContext.Provider value={{ user, loading, login, verifyOTP, logout ,register}}>
       {children}
     </AuthContext.Provider>
   );

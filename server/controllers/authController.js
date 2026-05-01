@@ -21,9 +21,7 @@ exports.registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     try {
-        const newUser = new User.create({ name, email, password: hashedPassword ,role:'user', isVerified: false });
-
-        
+        const newUser = await User.create({ name, email, password: hashedPassword ,role:'user', isVerified: false });
 
         const otp= Math.floor(100000 + Math.random() * 900000).toString();
         console.log(`OTP for ${email}: ${otp}`);
@@ -34,7 +32,7 @@ exports.registerUser = async (req, res) => {
 
         res.status(201).json({ 
             message: 'User registered successfully. Please check your email for the OTP to verify your account.' ,
-            email:user.email
+            email: newUser.email
         });
 
     } catch (error) {
@@ -63,7 +61,7 @@ exports.loginUser = async (req, res) => {
         await OTP.create({ email, otp, action: 'account_verification' });
 
         await sendOTPEmail(email, otp, 'account_verification');
-        return res.status(400).json({ error: 'Account not verified. Please check your email for the OTP to verify your account.' });
+        return res.status(400).json({ error: 'Account not verified. Please check your email for the OTP to verify your account.', needsVerification: true });
     }
 
     res.json({

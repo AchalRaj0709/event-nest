@@ -1,8 +1,9 @@
 const express=require('express');
 const router=express.Router();
 const {protect,admin}=require('../middleware/auth');
-const {bookEvent,sendBookingOTP,getMyBookings,confirmBooking,cancelBooking}=require('../controllers/bookingController');
+const {bookEvent,sendBookingOTP,getMyBookings,getAllBookings,confirmBooking,cancelBooking}=require('../controllers/bookingController');
 
+router.get('/',protect,admin,getAllBookings);
 router.post('/',protect,bookEvent);
 router.post('/send-otp',protect,sendBookingOTP);
 router.get('/my',protect,getMyBookings);

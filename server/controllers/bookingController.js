@@ -80,6 +80,11 @@ exports.getMyBookings = async (req, res) => {
     res.json(bookings);
 };
 
+exports.getAllBookings = async (req, res) => {
+    const bookings = await Booking.find().populate('eventId').populate('userId', 'name email');
+    res.json(bookings);
+};
+
 exports.cancelBooking = async (req, res) => {
     const booking=await Booking.findById(req.params.id);
     if(!booking){
